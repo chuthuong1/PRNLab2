@@ -44,7 +44,7 @@ namespace WebApplication1.Pages.Products
             return RedirectToPage("/Cart/List");
         }
 
-        private void AddProductToCart(Product p)
+        private void AddProductToCart(ProductDTO p)
         {
             var cart = SessionHelper.GetObjectFromJson<List<CartItem>>(HttpContext.Session, "cart");
             if (cart == null)

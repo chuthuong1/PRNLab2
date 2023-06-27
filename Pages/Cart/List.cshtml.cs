@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using WebApplication1.Bussiness.DTO;
 using WebApplication1.DataAccess.Models;
@@ -50,21 +50,28 @@ namespace WebApplication1.Pages.Cart
         public IActionResult OnPostCheckout()
         {
             CartItems = SessionHelper.GetObjectFromJson<List<CartItem>>(HttpContext.Session, "cart");
-
-            foreach (var cartItem in CartItems)
+            if (CartItems == null || CartItems.Count == 0)
             {
-                var product = _productRepository.GetProductById(cartItem.Product.ProductId);
-                if (product != null)
-                {
-                    product.UnitsInStock -= cartItem.Quantity;
-                    _productRepository.UpdateProduct(product);
-                }
+                ViewData["mess"] = "Giỏ hàng đang trống!";
+                return Page();
             }
+            else
+            {
+                foreach (var cartItem in CartItems)
+                {
+                    var product = _productRepository.GetProductById(cartItem.Product.ProductId);
+                    if (product != null)
+                    {
+                        product.UnitsInStock -= cartItem.Quantity;
+                        _productRepository.UpdateProduct(product);
+                    }
+                }
 
-            HttpContext.Session.Remove("cart");
-            ViewData["mess"] = "Checkout Successful!";
+                HttpContext.Session.Remove("cart");
+                ViewData["mess"] = "Checkout Successful!";
 
-            return Page();
+                return RedirectToPage("/Products/List");
+            }
         }
     }
 }

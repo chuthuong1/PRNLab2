@@ -6,17 +6,17 @@
 <link rel="stylesheet" href="~/Css/CartCss.css" />
 <div class="container">
     <h2>Cart</h2>
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Tên</th>
-            <th>Giá</th>
-            <th>Số Lượng</th>
-            <th></th>
-            <th></th>
-        </tr>
-        @if (Model.CartItems != null && Model.CartItems.Count > 0)
-        {
+    @if (Model.CartItems != null && Model.CartItems.Count > 0)
+    {
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Tên</th>
+                <th>Giá</th>
+                <th>Số Lượng</th>
+                <th></th>
+                <th></th>
+            </tr>
             @foreach (CartItem c in Model.CartItems)
             {
                 <tr>
@@ -37,12 +37,16 @@
                     </form>
                 </tr>
             }
-        }
-    </table>
+        </table>
 
-    <form method="post" asp-page-handler="Checkout">
-        <button class="btn checkout-btn">Thanh Toán</button>
-    </form>
+        <form method="post" asp-page-handler="Checkout">
+            <button class="btn checkout-btn">Thanh Toán</button>
+        </form>
+    }
+    else
+    {
+        <p>Giỏ hàng đang trống.</p>
+    }
 </div>
 
 @if (ViewData["mess"] != null)
