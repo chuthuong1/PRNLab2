@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using System;
+using WebApplication1.ChatHubSignarl; // si
 using WebApplication1.Bussiness.IRepository;
 using WebApplication1.Bussiness.Mapping;
 using WebApplication1.Bussiness.Repository;
@@ -9,6 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors();
 builder.Services.AddRazorPages();
+//si
+builder.Services.AddSignalR();
+
 builder.Services.AddTransient<IProductRepository, ProductRepository>()
     .AddDbContext<NorthWindContext>(opt => builder.Configuration.GetConnectionString("Northwind"));
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -26,5 +30,7 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapRazorPages();
+// si
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();

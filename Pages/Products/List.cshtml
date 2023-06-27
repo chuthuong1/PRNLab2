@@ -48,7 +48,7 @@
             <div class="pagination">
                 @if (currentPage > 1)
                 {
-                    <a asp-page="/Products/List" asp-route-page="1">First</a>
+                    <a asp-page="/Products/List/{page}" asp-route-page="1">First</a>
                     <a asp-page="/Products/List" asp-route-page="@(currentPage - 1)">Previous</a>
                 }
                 @for (int i = 1; i <= totalPages; i++)
@@ -59,7 +59,7 @@
                     }
                     else
                     {
-                        <a asp-page="/Products/List" asp-route-page="@i">@i</a>
+                        <a asp-page="/Products/List" asp-route-page="2">@i</a>
                     }
                 }
                 @if (currentPage < totalPages)

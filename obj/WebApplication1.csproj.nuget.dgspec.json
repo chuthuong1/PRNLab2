@@ -67,6 +67,10 @@
               "target": "Package",
               "version": "[13.0.3, )"
             },
+            "PagedList": {
+              "target": "Package",
+              "version": "[1.17.0, )"
+            },
             "Unipluss.Sign.Client": {
               "target": "Package",
               "version": "[1.0.2876, )"

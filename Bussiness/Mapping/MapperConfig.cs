@@ -6,6 +6,7 @@ namespace WebApplication1.Bussiness.Mapping
     {
         public static Mapper InitializeAutomapper()
         {
+            // Create a mapper configuration object
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile(new MappingProfile());

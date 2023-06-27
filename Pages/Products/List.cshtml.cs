@@ -5,6 +5,7 @@ using WebApplication1.Bussiness.IRepository;
 using WebApplication1.Helper;
 using System.Collections.Generic;
 using System.Linq;
+using WebApplication1.DataAccess.Models;
 
 namespace WebApplication1.Pages.Products
 {
@@ -13,7 +14,7 @@ namespace WebApplication1.Pages.Products
         public List<ProductDTO> products { get; set; }
         public IProductRepository productRepository { get; set; }
         public int CurrentPage { get; set; }
-        public int ProductsPerPage { get; set; } = 15;
+        public int ProductsPerPage { get; set; } = 5;
         public int TotalProducts { get; set; }
 
         public ListModel(IProductRepository productRepository)
@@ -21,8 +22,13 @@ namespace WebApplication1.Pages.Products
             this.productRepository = productRepository;
         }
 
-        public void OnGet(int page = 1)
+        public void OnGet(int page)
         {
+            if (page == 0)
+            {
+                page = 1;
+            }
+
             CurrentPage = page;
             GetData();
         }
@@ -38,7 +44,7 @@ namespace WebApplication1.Pages.Products
             return RedirectToPage("/Cart/List");
         }
 
-        private void AddProductToCart(ProductDTO p)
+        private void AddProductToCart(Product p)
         {
             var cart = SessionHelper.GetObjectFromJson<List<CartItem>>(HttpContext.Session, "cart");
             if (cart == null)

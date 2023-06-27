@@ -95,3 +95,5 @@ E:\PRN221\L2\WebApplication1\bin\Debug\net6.0\Unipluss.Sign.Client.dll
 E:\PRN221\L2\WebApplication1\bin\Debug\net6.0\Unipluss.Sign.Common.Rest.dll
 E:\PRN221\L2\WebApplication1\bin\Debug\net6.0\Unipluss.Sign.Common.Validation.dll
 E:\PRN221\L2\WebApplication1\bin\Debug\net6.0\Unipluss.Sign.ExternalContract.dll
+E:\PRN221\L2\WebApplication1\bin\Debug\net6.0\libman.json
+E:\PRN221\L2\WebApplication1\bin\Debug\net6.0\PagedList.dll

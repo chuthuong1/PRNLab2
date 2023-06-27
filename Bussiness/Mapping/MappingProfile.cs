@@ -7,9 +7,11 @@ namespace WebApplication1.Bussiness.Mapping
     {
         public MappingProfile()
         {
-            CreateMap<Product, ProductDTO>()
-                .ForMember(des => des.Category,
-                act => act.MapFrom(src => src.Category));
+            CreateMap<Product, ProductDTO>().ReverseMap();// lay het tat ca cac thuoc tinh cua ProductDTO gan vao Product va nguoc lai
+
+
+            //.ForMember(des => des.Category,
+            //act => act.MapFrom(src => src.Category));
         }
     }
 }
