@@ -4,17 +4,22 @@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
-    var currentPage = Model.CurrentPage;
-    var productsPerPage = Model.ProductsPerPage;
-    var totalProducts = Model.TotalProducts;
-    var totalPages = (int)Math.Ceiling((double)totalProducts / productsPerPage);
-}
+  }
 
 <link rel="stylesheet" href="~/Css/StyleSheet.css" />
 
 <div class="container">
     <div class="left">
-        <!-- Nội dung của khối trái -->
+        <div>
+            <label for="category">Danh mục:</label>
+            <select id="category" name="category" onchange="onCategoryChange()">
+                <option value="">Tất cả</option>
+                @foreach (var category in Model.Categories)
+                {
+                    <option value="@category.CategoryId">@category.CategoryName</option>
+                }
+            </select>
+        </div>
     </div>
     <div class="right">
         <div class="upper">
@@ -27,7 +32,7 @@
         </div>
         <div class="lower">
             <!-- Nội dung của khối dưới -->
-            @foreach (ProductDTO p in Model.GetProductsForPage(currentPage, productsPerPage))
+            @foreach (ProductDTO p in Model.Products)
             {
                 <div class="item-wrap">
                     <div class="item">
@@ -35,6 +40,7 @@
                         <h3>@p.ProductName</h3>
                         <div class="price_sold">
                             <p class="price">@p.UnitPrice đ</p>
+                            <p class="quantity"><span id="quantity_@p.ProductId">@p.UnitsInStock</span></p>
                             <p class="sold">đã bán @p.UnitsOnOrder</p>
                         </div>
                     </div>
@@ -45,29 +51,7 @@
                 </div>
             }
 
-            <div class="pagination">
-                @if (currentPage > 1)
-                {
-                    <a asp-page="/Products/List/{page}" asp-route-page="1">First</a>
-                    <a asp-page="/Products/List" asp-route-page="@(currentPage - 1)">Previous</a>
-                }
-                @for (int i = 1; i <= totalPages; i++)
-                {
-                    if (i == currentPage)
-                    {
-                        <span>@i</span>
-                    }
-                    else
-                    {
-                        <a asp-page="/Products/List" asp-route-page="2">@i</a>
-                    }
-                }
-                @if (currentPage < totalPages)
-                {
-                    <a asp-page="/Products/List" asp-route-page="@(currentPage + 1)">Next</a>
-                    <a asp-page="/Products/List" asp-route-page="@totalPages">Last</a>
-                }
-            </div>
+         
         </div>
     </div>
 </div>
@@ -80,3 +64,51 @@
         };
     </script>
 }
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.8/signalr.min.js"></script>
+<script>
+    var connection = new signalR.HubConnectionBuilder()
+        .withUrl("/cartHub") // Đường dẫn tới CartHub đã được map trong tệp Program.cs
+        .build();
+
+    connection.start().then(function () {
+        console.log("SignalR connected.");
+    }).catch(function (err) {
+        console.error(err.toString());
+    });
+
+    connection.on("ReceiveCartItemQuantity", function (productId, quantity) {
+        // Xử lý thông điệp realtime nhận được từ server
+        // Ở đây, bạn có thể cập nhật số lượng sản phẩm cụ thể trên giao diện
+        var elementId = "quantity_" + productId;
+        document.getElementById(elementId).textContent = quantity;
+    });
+</script>
+
+<script>
+    function onCategoryChange() {
+        var selectedCategoryId = document.getElementById("category").value;
+
+        // Lưu giá trị danh mục được chọn vào local storage
+        localStorage.setItem("selectedCategoryId", selectedCategoryId);
+
+        // Gửi yêu cầu lấy sản phẩm theo danh mục đến server
+        var url = `/Products/List?page=1&categoryId=${selectedCategoryId}`;
+        window.location.href = url;
+    }
+
+    window.onload = function () {
+        var selectedCategoryId = localStorage.getItem("selectedCategoryId");
+
+        // Kiểm tra nếu có giá trị danh mục được lưu trong local storage
+        if (selectedCategoryId) {
+            // Gửi yêu cầu lấy sản phẩm theo danh mục đến server
+            var url = `/Products/List?page=1&categoryId=${selectedCategoryId}`;
+            window.location.href = url;
+
+            // Xóa giá trị danh mục đã lưu trong local storage
+            localStorage.removeItem("selectedCategoryId");
+        }
+    };
+</script>
+

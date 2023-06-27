@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Unipluss.Sign.ExternalContract.Entities;
 using WebApplication1.Bussiness.DTO;
 using WebApplication1.Bussiness.IRepository;
 using WebApplication1.Bussiness.Mapping;
@@ -96,5 +97,44 @@ namespace WebApplication1.Bussiness.Repository
                 context.SaveChanges();
             }
         }
+        public List<ProductDTO> GetProductsByCategory(int categoryId)
+        {
+            // Lấy danh sách sản phẩm theo danh mục (category) từ cơ sở dữ liệu
+            var products = context.Products
+                .Where(p => p.CategoryId == categoryId)
+                .ToList();
+
+            // Chuyển đổi danh sách sản phẩm thành DTO và trả về
+            return mapper.Map<List<ProductDTO>>(products);
+        }
+
+        public List<CategoryDTO> GetCategories()
+        {
+            var categories = context.Categories.ToList();
+            var categoryDTOs = mapper.Map<List<CategoryDTO>>(categories);
+            return categoryDTOs;
+        }
+
+        public List<ProductDTO> GetProductsByCategory(int? categoryId)
+        {
+            try
+            {
+
+                    // Trường hợp categoryId không phải null, load sản phẩm theo categoryId
+                    var products = context.Products
+                        .Include(p => p.Category)
+                        .Where(p => p.CategoryId == categoryId)
+                        .ToList();
+
+                    return mapper.Map<List<ProductDTO>>(products);
+                
+            }
+            catch (Exception ex)
+            {
+                throw new FormatException();
+            }
+        }
+
     }
 }
+

@@ -8,7 +8,7 @@ namespace WebApplication1.Bussiness.Mapping
         public MappingProfile()
         {
             CreateMap<Product, ProductDTO>().ReverseMap();// lay het tat ca cac thuoc tinh cua ProductDTO gan vao Product va nguoc lai
-
+            CreateMap<Category, CategoryDTO>().ReverseMap();
 
             //.ForMember(des => des.Category,
             //act => act.MapFrom(src => src.Category));

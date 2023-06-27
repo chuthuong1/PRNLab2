@@ -8,5 +8,8 @@ namespace WebApplication1.Bussiness.IRepository
         public ProductDTO GetProduct(int id);
         public ProductDTO GetProductById(int id);
         void UpdateProduct(ProductDTO product);
+        public List<ProductDTO> GetProductsByCategory(int? categoryId);
+        public List<CategoryDTO> GetCategories();
+
     }
 }

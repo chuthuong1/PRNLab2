@@ -6,32 +6,44 @@ using WebApplication1.Helper;
 using System.Collections.Generic;
 using System.Linq;
 using WebApplication1.DataAccess.Models;
+using Microsoft.AspNetCore.SignalR;
+using WebApplication1.ChatHubSignarl;
+using Unipluss.Sign.ExternalContract.Entities;
 
 namespace WebApplication1.Pages.Products
 {
     public class ListModel : PageModel
     {
-        public List<ProductDTO> products { get; set; }
+        private readonly IHubContext<CartHub> _hubContext;
         public IProductRepository productRepository { get; set; }
-        public int CurrentPage { get; set; }
-        public int ProductsPerPage { get; set; } = 5;
-        public int TotalProducts { get; set; }
+        public List<ProductDTO> Products { get; set; } // Danh sách sản phẩm
+        public List<CategoryDTO> Categories { get; set; } // Danh sách danh mục
 
-        public ListModel(IProductRepository productRepository)
+        public ListModel(IProductRepository productRepository, IHubContext<CartHub> hubContext)
         {
             this.productRepository = productRepository;
+            _hubContext = hubContext;
         }
 
-        public void OnGet(int page)
+        public void OnGet(int? categoryId)
         {
-            if (page == 0)
+
+            // Lấy danh sách danh mục từ repository
+            Categories = productRepository.GetCategories();
+
+            // Lấy sản phẩm theo danh mục (nếu categoryId được chọn)
+            if (categoryId != null)
             {
-                page = 1;
+                Products = productRepository.GetProductsByCategory(categoryId.Value);
+            }
+            else
+            {
+                Products = productRepository.GetProducts();
             }
 
-            CurrentPage = page;
-            GetData();
+
         }
+
 
         public IActionResult OnPostAddToCart(int? productId)
         {
@@ -73,18 +85,23 @@ namespace WebApplication1.Pages.Products
                 }
             }
             SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", cart);
+            // Gửi thông điệp realtime đến tất cả các kết nối khách hàng
+            _hubContext.Clients.All.SendAsync("ReceiveCartQuantity", cart.Count);
         }
 
         private void GetData()
         {
-            products = productRepository.GetProducts();
-            TotalProducts = products.Count;
+
+            // Lấy danh sách danh mục từ repository
+            Categories = productRepository.GetCategories();
+
+            // Lấy tất cả sản phẩm
+            Products = productRepository.GetProducts();
+
         }
 
-        public List<ProductDTO> GetProductsForPage(int currentPage, int productsPerPage)
-        {
-            int skip = (currentPage - 1) * productsPerPage;
-            return products.Skip(skip).Take(productsPerPage).ToList();
-        }
+
+
+
     }
 }
