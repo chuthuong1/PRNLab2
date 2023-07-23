@@ -4,18 +4,25 @@ using WebApplication1.Bussiness.DTO;
 using WebApplication1.DataAccess.Models;
 using WebApplication1.Helper;
 using WebApplication1.Bussiness.IRepository;
+using Microsoft.AspNetCore.SignalR;
+//using Microsoft.EntityFrameworkCore;
+using WebApplication1.Hubs;
+using WebApplication1.Bussiness.Repository;
 
 namespace WebApplication1.Pages.Cart
 {
     public class ListModel : PageModel
     {
         private readonly IProductRepository _productRepository;
+        private readonly IHubContext<QuantityHub> _hubContext;
+        public IOrderRepository _orderRepository;
 
         public List<CartItem> CartItems { get; set; }
 
-        public ListModel(IProductRepository productRepository)
+        public ListModel(IProductRepository productRepository, IHubContext<QuantityHub> hubContext)
         {
             _productRepository = productRepository;
+            _hubContext = hubContext;
         }
 
         public void OnGet()
@@ -47,7 +54,7 @@ namespace WebApplication1.Pages.Cart
             SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", CartItems);
         }
 
-        public IActionResult OnPostCheckout()
+        public async Task<IActionResult> OnPostCheckout()
         {
             CartItems = SessionHelper.GetObjectFromJson<List<CartItem>>(HttpContext.Session, "cart");
             if (CartItems == null || CartItems.Count == 0)
@@ -63,14 +70,25 @@ namespace WebApplication1.Pages.Cart
                     if (product != null)
                     {
                         product.UnitsInStock -= cartItem.Quantity;
+                        product.UnitsOnOrder -= cartItem.Quantity;
                         _productRepository.UpdateProduct(product);
                     }
                 }
+                // Tạo đối tượng Order mới
+
 
                 HttpContext.Session.Remove("cart");
                 ViewData["mess"] = "Checkout Successful!";
 
+                // Lấy danh sách các ProductId và Quantity từ giỏ hàng
+                var productIds = CartItems.Select(c => c.Product.ProductId).ToList();
+                var quantities = CartItems.Select(c => c.Quantity).ToList();
+
+                // Gửi thông điệp SignalR để cập nhật số lượng UnitsInStock
+                await _hubContext.Clients.All.SendAsync("UpdateUnitsInStock", productIds, quantities);
+
                 return RedirectToPage("/Products/List");
+
             }
         }
     }

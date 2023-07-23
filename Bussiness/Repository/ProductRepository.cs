@@ -12,29 +12,24 @@ namespace WebApplication1.Bussiness.Repository
 {
     public class ProductRepository : IProductRepository
     {
-        NorthWindContext context;
+        private readonly NorthwindContext _context;
         Mapper mapper;
-        public ProductRepository(NorthWindContext context)
+        public ProductRepository(NorthwindContext context)
         {
-            this.context = context;
+            _context = context;
             this.mapper = MapperConfig.InitializeAutomapper();
         }
 
         public ProductDTO GetProduct(int id)
         {
-            ProductManager m = new ProductManager(context);
+            ProductManager m = new ProductManager(_context);
             ProductDTO product = mapper.Map<ProductDTO>(m.GetProduct(id));
             return product;
         }
 
-        public ProductDTO GetProductById(int id)
+        public async Task<ProductDTO> GetProductById(int id)
         {
-            // Kết nối với cơ sở dữ liệu và truy vấn sản phẩm dựa trên ID
-            ProductManager m = new ProductManager(context);
-            // Sau đó, chuyển đổi dữ liệu sản phẩm từ định dạng cơ sở dữ liệu thành đối tượng ProductDTO
-            // Trả về đối tượng ProductDTO chứa thông tin sản phẩm tương ứng với ID đã cho
-
-            var productEntity = context.Products.FirstOrDefault(p => p.ProductId == id);
+            var productEntity = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == id);
             if (productEntity != null)
             {
                 var productDTO = ConvertToProductDTO(productEntity);
@@ -78,7 +73,7 @@ namespace WebApplication1.Bussiness.Repository
 
         public List<ProductDTO> GetProducts()
         {
-            ProductManager m = new ProductManager(context);
+            ProductManager m = new ProductManager(_context);
             List<ProductDTO> products = mapper.Map<List<ProductDTO>>(m.GetProducts());
             return products;
         }
@@ -87,20 +82,20 @@ namespace WebApplication1.Bussiness.Repository
 
         public void UpdateProduct(ProductDTO product)
         {
-            var productEntity = context.Products.FirstOrDefault(p => p.ProductId == product.ProductId);
+            var productEntity = _context.Products.FirstOrDefault(p => p.ProductId == product.ProductId);
             if (productEntity != null)
             {
                 // Cập nhật thông tin số lượng sản phẩm
                 productEntity.UnitsInStock = (short?)product.UnitsInStock;
-
+                productEntity.UnitsOnOrder = (short?)product.UnitsOnOrder;
                 // Lưu các thay đổi vào cơ sở dữ liệu
-                context.SaveChanges();
+                _context.SaveChanges();
             }
         }
         public List<ProductDTO> GetProductsByCategory(int categoryId)
         {
             // Lấy danh sách sản phẩm theo danh mục (category) từ cơ sở dữ liệu
-            var products = context.Products
+            var products = _context.Products
                 .Where(p => p.CategoryId == categoryId)
                 .ToList();
 
@@ -110,7 +105,7 @@ namespace WebApplication1.Bussiness.Repository
 
         public List<CategoryDTO> GetCategories()
         {
-            var categories = context.Categories.ToList();
+            var categories = _context.Categories.ToList();
             var categoryDTOs = mapper.Map<List<CategoryDTO>>(categories);
             return categoryDTOs;
         }
@@ -120,14 +115,14 @@ namespace WebApplication1.Bussiness.Repository
             try
             {
 
-                    // Trường hợp categoryId không phải null, load sản phẩm theo categoryId
-                    var products = context.Products
-                        .Include(p => p.Category)
-                        .Where(p => p.CategoryId == categoryId)
-                        .ToList();
+                // Trường hợp categoryId không phải null, load sản phẩm theo categoryId
+                var products = _context.Products
+                    .Include(p => p.Category)
+                    .Where(p => p.CategoryId == categoryId)
+                    .ToList();
 
-                    return mapper.Map<List<ProductDTO>>(products);
-                
+                return mapper.Map<List<ProductDTO>>(products);
+
             }
             catch (Exception ex)
             {
@@ -135,6 +130,44 @@ namespace WebApplication1.Bussiness.Repository
             }
         }
 
+        public Product addproduct(Product product)
+        {
+            // add product
+            var productEntity = new Product
+            {
+                ProductId = product.ProductId,
+                ProductName = product.ProductName,
+                SupplierId = product.SupplierId,
+                CategoryId = product.CategoryId,
+                QuantityPerUnit = product.QuantityPerUnit,
+                UnitPrice = product.UnitPrice,
+                UnitsInStock = (short?)product.UnitsInStock,
+                UnitsOnOrder = (short?)product.UnitsOnOrder,
+                ReorderLevel = product.ReorderLevel,
+                Discontinued = product.Discontinued,
+            };
+            return productEntity;
+
+        }
+
+        public void AddProduct(ProductDTO product)
+        {
+            var productEntity = new Product
+            {
+                ProductId = product.ProductId,
+                ProductName = product.ProductName,
+                SupplierId = product.SupplierId,
+                CategoryId = product.CategoryId,
+                QuantityPerUnit = product.QuantityPerUnit,
+                UnitPrice = product.UnitPrice,
+                UnitsInStock = (short?)product.UnitsInStock,
+                UnitsOnOrder = (short?)product.UnitsOnOrder,
+                ReorderLevel = product.ReorderLevel,
+                Discontinued = product.Discontinued,
+            };
+            _context.Add(productEntity);
+            _context.SaveChanges();
+        }
     }
 }
 

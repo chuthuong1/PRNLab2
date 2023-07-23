@@ -3748,11 +3748,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\PRN221\\L2\\WebApplication1\\WebApplication1.csproj",
+      "projectUniqueName": "C:\\Users\\Thuong\\Downloads\\PRNLab2-Thuong\\PRNLab2-Thuong\\WebApplication1.csproj",
       "projectName": "WebApplication1",
-      "projectPath": "E:\\PRN221\\L2\\WebApplication1\\WebApplication1.csproj",
+      "projectPath": "C:\\Users\\Thuong\\Downloads\\PRNLab2-Thuong\\PRNLab2-Thuong\\WebApplication1.csproj",
       "packagesPath": "C:\\Users\\Thuong\\.nuget\\packages\\",
-      "outputPath": "E:\\PRN221\\L2\\WebApplication1\\obj\\",
+      "outputPath": "C:\\Users\\Thuong\\Downloads\\PRNLab2-Thuong\\PRNLab2-Thuong\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

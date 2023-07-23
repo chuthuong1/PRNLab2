@@ -19,6 +19,8 @@ namespace WebApplication1.Pages.Products
         public List<ProductDTO> Products { get; set; } // Danh sách sản phẩm
         public List<CategoryDTO> Categories { get; set; } // Danh sách danh mục
 
+        public List<Product> products { get; set; }
+
         public ListModel(IProductRepository productRepository, IHubContext<CartHub> hubContext)
         {
             this.productRepository = productRepository;
@@ -27,21 +29,11 @@ namespace WebApplication1.Pages.Products
 
         public void OnGet(int? categoryId)
         {
-
             // Lấy danh sách danh mục từ repository
             Categories = productRepository.GetCategories();
 
             // Lấy sản phẩm theo danh mục (nếu categoryId được chọn)
-            if (categoryId != null)
-            {
-                Products = productRepository.GetProductsByCategory(categoryId.Value);
-            }
-            else
-            {
-                Products = productRepository.GetProducts();
-            }
-
-
+            Products = categoryId != null ? productRepository.GetProductsByCategory(categoryId.Value) : productRepository.GetProducts();
         }
 
 
@@ -49,44 +41,51 @@ namespace WebApplication1.Pages.Products
         {
             if (productId != null)
             {
-                AddProductToCart(productRepository.GetProduct(productId.Value));
-                ViewData["mess"] = "Add To Cart Successful!";
+                var product = productRepository.GetProduct(productId.Value);
+                if (product != null)
+                {
+                    // Kiểm tra số lượng sản phẩm có lớn hơn 0 hay không
+                    if (product.UnitsInStock > 0)
+                    {
+                        AddProductToCart(product);
+                        ViewData["mess"] = "Thêm vào giỏ hàng thành công!";
+                    }
+                    else
+                    {
+                        ViewData["mess"] = "Sản phẩm hiện không có sẵn trong kho!";
+                    }
+                }
             }
-            GetData();
-            return RedirectToPage("/Cart/List");
+            // GetData();
+            return RedirectToPage("/Cart/Index");
         }
 
-        private void AddProductToCart(ProductDTO p)
+
+        private async Task AddProductToCart(ProductDTO product)
         {
             var cart = SessionHelper.GetObjectFromJson<List<CartItem>>(HttpContext.Session, "cart");
+
             if (cart == null)
             {
                 cart = new List<CartItem>();
-                cart.Add(new CartItem()
+            }
+
+            var existingCartItem = cart.FirstOrDefault(c => c.Product.ProductId == product.ProductId);
+            if (existingCartItem == null)
+            {
+                cart.Add(new CartItem
                 {
-                    Product = p,
+                    Product = product,
                     Quantity = 1
                 });
             }
             else
             {
-                CartItem c = cart.FirstOrDefault(c => c.Product.ProductId == p.ProductId);
-                if (c == null)
-                {
-                    cart.Add(new CartItem()
-                    {
-                        Product = p,
-                        Quantity = 1
-                    });
-                }
-                else
-                {
-                    c.Quantity += 1;
-                }
+                existingCartItem.Quantity++;
             }
+
             SessionHelper.SetObjectAsJson(HttpContext.Session, "cart", cart);
-            // Gửi thông điệp realtime đến tất cả các kết nối khách hàng
-            _hubContext.Clients.All.SendAsync("ReceiveCartQuantity", cart.Count);
+            //await _hubContext.Clients.All.SendAsync("CartUpdated");
         }
 
         private void GetData()

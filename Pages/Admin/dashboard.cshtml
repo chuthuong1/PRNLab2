@@ -1,0 +1,87 @@
+﻿@page
+@model WebApplication1.Pages.Admin.dashboardModel
+@{
+    Layout = "~/Pages/Shared/_LayoutAdmin.cshtml";
+}
+
+<div id="content-right">
+    <div class="content-wrapper">
+        <div class="container-fluid">
+            <div class="row mb-4">
+
+                <!-- Icon Cards-->
+                <div class="col-lg-4 col-md-4 col-sm-6 col-12 mb-2 mt-4">
+                    <div class="rounded-2">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-4 col-sm-4 col-4 rideone bg-info">
+                                <i class="bi bi-currency-dollar"></i>
+                            </div>
+                            <div class="col-lg-9 col-md-8 col-sm-8 col-8 fontsty">
+                                <h4>Weekly Sales</h4>
+                              
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-sm-6 col-12 mb-2 mt-4">
+                    <div class="rounded-2">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-4 col-sm-4 col-4 ridetwo bg-success">
+                                <i class="bi bi-receipt"></i>
+
+                            </div>
+                            <div class="col-lg-9 col-md-8 col-sm-8 col-8 fontsty">
+                                <h4>Total Weekly Order</h4>
+                               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-sm-6 col-12 mb-2 mt-4">
+                    <div class="rounded-2">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-4 col-sm-4 col-4 ridethree  bg-secondary">
+                                <i class="bi bi-person-vcard"></i>
+                            </div>
+                            <div class="col-lg-9 col-md-8 col-sm-8 col-8 fontsty">
+                                <h4>Total Customers</h4>
+                               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row m-auto mb-3">
+                <form method="get" id="form-order-year">
+                    <select name="orderyear" onchange="document.getElementById('form-order-year').submit();">
+                        <option value="0">Current</option>
+                       
+                    </select>
+                </form>
+            </div>
+            <div id="dashboard-2">
+                <div id="chart" style="text-align: center;">
+                    <div id="chart1">
+                        <div class="row">
+                            <div class="col-6">
+                                <h3>Statistic Orders (Month)</h3>
+                                <canvas id="myChart1" style="width: 90%; height:5px"></canvas>
+
+                            </div>
+                            <div class="col-6">
+                                <h3>Income (Month)</h3>
+                                <canvas id="myChart2" style="width: 90%; height:5px"></canvas>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -4,16 +4,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WebApplication1.DataAccess.Models;
 
-public partial class NorthWindContext : DbContext
+public partial class NorthwindContext : DbContext
 {
-    public NorthWindContext()
+    public NorthwindContext()
     {
     }
 
-    public NorthWindContext(DbContextOptions<NorthWindContext> options)
+    public NorthwindContext(DbContextOptions<NorthwindContext> options)
         : base(options)
     {
     }
+
+    public virtual DbSet<Account> Accounts { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
 
@@ -33,10 +35,34 @@ public partial class NorthWindContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("server=DESKTOP-IRP03E2\\THUONG;database = NorthWind;uid=sa;pwd=123; Trusted_Connection=SSPI;Encrypt=false;TrustServerCertificate=true");
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-IRP03E2\\THUONG;Database=Northwind;User Id=sa;Password=123;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Account>(entity =>
+        {
+            entity.Property(e => e.AccountId).HasColumnName("AccountID");
+            entity.Property(e => e.CustomerId)
+                .HasMaxLength(5)
+                .IsFixedLength()
+                .HasColumnName("CustomerID");
+            entity.Property(e => e.Email)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.EmployeeId).HasColumnName("EmployeeID");
+            entity.Property(e => e.Password)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.Customer).WithMany(p => p.Accounts)
+                .HasForeignKey(d => d.CustomerId)
+                .HasConstraintName("FK_Accounts_Customers");
+
+            entity.HasOne(d => d.Employee).WithMany(p => p.Accounts)
+                .HasForeignKey(d => d.EmployeeId)
+                .HasConstraintName("FK_Accounts_Employees");
+        });
+
         modelBuilder.Entity<Category>(entity =>
         {
             entity.Property(e => e.CategoryId).HasColumnName("CategoryID");

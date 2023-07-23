@@ -1,19 +1,24 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using Unipluss.Sign.ExternalContract.Entities;
+using WebApplication1.Bussiness.DTO;
+using WebApplication1.Bussiness.IRepository;
+using WebApplication1.Bussiness.Repository;
+using WebApplication1.DataAccess.Models;
+
 
 namespace WebApplication1.ChatHubSignarl
 {
     public class CartHub : Hub
     {
-        public async Task UpdateCartQuantity(int quantity)
-        {
-            // Gửi thông điệp realtime đến tất cả các kết nối khách hàng
-            await Clients.All.SendAsync("ReceiveCartQuantity", quantity);
-        }
-        public async Task UpdateCartItemQuantity(int productId, int quantity)
-        {
-            // Gửi thông điệp realtime đến tất cả các kết nối khách hàng
-            await Clients.All.SendAsync("ReceiveCartItemQuantity", productId, quantity);
-        }
+
+        //// update quantity của sản phẩm
+        //// Define a method to broadcast cart updates to all connected clients
+        //public async Task BroadcastCartUpdate()
+        //{
+        //    await Clients.All.SendAsync("CartUpdated");
+        //}
+
     }
 }

@@ -3,8 +3,8 @@ namespace WebApplication1.DataAccess.Manager
 {
     public class ProductManager
     {
-        NorthWindContext context;
-        public ProductManager(NorthWindContext context)
+        NorthwindContext context;
+        public ProductManager(NorthwindContext context)
         {
             this.context = context;
         }

@@ -10,48 +10,50 @@
 
 <div class="container">
     <div class="left">
-        <div>
-            <label for="category">Danh mục:</label>
-            <select id="category" name="category" onchange="onCategoryChange()">
-                <option value="">Tất cả</option>
-                @foreach (var category in Model.Categories)
-                {
-                    <option value="@category.CategoryId">@category.CategoryName</option>
-                }
-            </select>
-        </div>
     </div>
     <div class="right">
         <div class="upper">
             <!-- Nội dung của khối trên -->
-            <a asp-page="/Products/CartItem" asp-page-handler="OnGet" id="cartLink">
+            <a asp-page="/Products/Add" asp-page-handler="OnGet" id="cartLink">
                 <!-- Chuyển đến trang giỏ hàng -->
                 <span class="cart-icon">&#128722;</span> <!-- Biểu tượng giỏ hàng -->
-                <span id="cartQuantity">1</span> <!-- Hiển thị số lượng sản phẩm trong giỏ hàng -->
+                <span id="cartQuantity">Add Product</span> <!-- Hiển thị số lượng sản phẩm trong giỏ hàng -->
             </a>
         </div>
         <div class="lower">
             <!-- Nội dung của khối dưới -->
-            @foreach (ProductDTO p in Model.Products)
-            {
-                <div class="item-wrap">
-                    <div class="item">
-                        <img class="img" src="@p.ImgUrl" />
-                        <h3>@p.ProductName</h3>
-                        <div class="price_sold">
-                            <p class="price">@p.UnitPrice đ</p>
-                            <p class="quantity"><span id="quantity_@p.ProductId">@p.UnitsInStock</span></p>
-                            <p class="sold">đã bán @p.UnitsOnOrder</p>
-                        </div>
-                    </div>
-                    <form method="post" asp-page-handler="AddToCart">
-                        <input type="hidden" name="productId" value="@p.ProductId" />
-                        <button>Add To Cart</button>
-                    </form>
-                </div>
-            }
+            <table>
+                <tr>
+                    <th>Product ID</th>
+                    <th>Product Name</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Action</th>
+                </tr>
+                @foreach (ProductDTO p in Model.Products)
+                {
+                    <tr pid="@p.ProductId" >
+                        <td>@p.ProductId</td>
+                        <td>@p.ProductName</td>
+                        <td>@p.UnitPrice đ</td>
+                        <td rowspan="2" id="quantity" class="quantityAbc">@p.UnitsInStock</td>
+                        <td rowspan="2">
+                            <form method="post" asp-page-handler="AddToCart">
+                                <input type="hidden" name="productId" value="@p.ProductId" />
+                                <button>Add To Cart</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                }
+            </table>
 
-         
+
+
         </div>
     </div>
 </div>
@@ -65,50 +67,7 @@
     </script>
 }
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.8/signalr.min.js"></script>
-<script>
-    var connection = new signalR.HubConnectionBuilder()
-        .withUrl("/cartHub") // Đường dẫn tới CartHub đã được map trong tệp Program.cs
-        .build();
 
-    connection.start().then(function () {
-        console.log("SignalR connected.");
-    }).catch(function (err) {
-        console.error(err.toString());
-    });
-
-    connection.on("ReceiveCartItemQuantity", function (productId, quantity) {
-        // Xử lý thông điệp realtime nhận được từ server
-        // Ở đây, bạn có thể cập nhật số lượng sản phẩm cụ thể trên giao diện
-        var elementId = "quantity_" + productId;
-        document.getElementById(elementId).textContent = quantity;
-    });
-</script>
-
-<script>
-    function onCategoryChange() {
-        var selectedCategoryId = document.getElementById("category").value;
-
-        // Lưu giá trị danh mục được chọn vào local storage
-        localStorage.setItem("selectedCategoryId", selectedCategoryId);
-
-        // Gửi yêu cầu lấy sản phẩm theo danh mục đến server
-        var url = `/Products/List?page=1&categoryId=${selectedCategoryId}`;
-        window.location.href = url;
-    }
-
-    window.onload = function () {
-        var selectedCategoryId = localStorage.getItem("selectedCategoryId");
-
-        // Kiểm tra nếu có giá trị danh mục được lưu trong local storage
-        if (selectedCategoryId) {
-            // Gửi yêu cầu lấy sản phẩm theo danh mục đến server
-            var url = `/Products/List?page=1&categoryId=${selectedCategoryId}`;
-            window.location.href = url;
-
-            // Xóa giá trị danh mục đã lưu trong local storage
-            localStorage.removeItem("selectedCategoryId");
-        }
-    };
-</script>
-
+<!-- Kết nối tới SignalR hub -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.12/signalr.min.js"></script>
+<script src="~/js/site.js"></script>
